@@ -16,6 +16,11 @@
             <a class="nav-link" href="{{ url_for('index') }}">Home</a>
          </li>
 
+
+         <li class="nav-item active"> 
+            <a class="nav-link" href="{{ url_for('past_mo_to_sun') }}">mo_su</a>
+         </li>
+
          
 
         
@@ -36,7 +41,7 @@
    </div>
 
 
-<!-- Modal  for inserting new purchase-->
+<!-- Modal  for inserting a new purchase-->
 <div id="insert_modal" class="modal fade" role="dialog" >
    <div class="modal-dialog" data-bs-theme="dark">
       <div class="modal-content" >
@@ -64,7 +69,7 @@
               <div class="form-group">
                   <label>comment:</label>
                   <h6 style="color: rgb(2, 3, 41)">Comments</h6>
-                  <input type="text" class="form-control" name="comment" required="1">
+                  <input type="text" class="form-control" name="comment">
               </div>
 
 

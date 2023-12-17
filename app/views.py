@@ -1,12 +1,14 @@
 from flask import render_template
 from app import app, db
-from app.models import *
+from app.models import *            
+from app.helper_functions import *  ## pay attention to imports  -- from helper_functions import * won't work 
 from flask import Flask, render_template, request, redirect, url_for, flash
 
-# @app.route('/')
-# def index():
-    # users = User.query.all()
-    # return render_template('base.html', users=users)
+from sqlalchemy import and_      ### to combine db queries in past Mo to su function 
+from calendar import monthrange  ### to combine db queries in past Mo to su function 
+from datetime import date, datetime, timedelta
+
+
 
 
 
@@ -20,7 +22,7 @@ def index():
 
 
 
-###### ADD
+###### ADD LEARNING SESSION or a TASK 
 @app.route('/add/', methods = ['POST'])
 def insert_subject():
     if request.method =='POST':
@@ -38,6 +40,8 @@ def insert_subject():
         return redirect(url_for('index'))
     
 
+
+
 ##### UPDATE
 @app.route('/update/', methods = ['POST'])
 def update():
@@ -52,6 +56,20 @@ def update():
         db.session.commit()
         flash("Գնումը Գրանցված է")
         return redirect(url_for('index'))
+    
+
+
+
+
+#####  LAST WEEK sunday to monday
+## see helper_functions for the query 
+@app.route('/mo_su')
+def past_mo_to_sun ():    
+
+    mo_to_sun = mo_su_query()
+
+    return render_template('mo_su.html', mo_to_sun=mo_to_sun )
+
     
 
 

@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import *
 
 
+
 app = Flask(__name__)
 
 ## See .env that's where you change it to prod dev or test
@@ -25,6 +26,7 @@ db = SQLAlchemy(app)
 
 #### Put This above and you have Circular Import Error
 from app import views, models
+
 
 with app.app_context():
     db.create_all()
