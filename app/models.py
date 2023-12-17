@@ -1,6 +1,6 @@
 from app import db
 
-from sqlalchemy import func
+from sqlalchemy import func, event, DDL
 
 ## For the track progess project remove this (later )
 class User(db.Model):
@@ -23,15 +23,19 @@ class Learn(db.Model):
 
 
 
-#### A table to store various data e.g. Weekly Learning Goal 
 class various(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    week_goal  = db.Column(db.Integer)
+    week_goal  = db.Column(db.Integer,  server_default="600")
 
 
 
 
-
-
-
+## This is to set a default value 600 learning hours to the table various
+## CAREFUL !!! The table already exists: If the various table already exists in your database, 
+## running db.create_all() won’t modify the existing table
+event.listen(
+    various.__table__,
+    'after_create',
+    DDL("INSERT INTO various (id) VALUES (1)")
+)

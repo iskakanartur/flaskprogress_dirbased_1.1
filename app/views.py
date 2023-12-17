@@ -9,6 +9,10 @@ from calendar import monthrange  ### to combine db queries in past Mo to su func
 from datetime import date, datetime, timedelta
 
 
+######## For Multi Plot Progress Bar
+from app.visualization import *
+
+
 
 
 
@@ -69,6 +73,22 @@ def past_mo_to_sun ():
     mo_to_sun = mo_su_query()
 
     return render_template('mo_su.html', mo_to_sun=mo_to_sun )
+
+
+
+
+
+#### Multi Plot Progress Bar 
+@app.route('/multi_progress_plot')
+def multi_progress_plot ():
+
+    multi_progress_plot_viz () ## see visualization.py 
+    sun_mon_plot = mo_su_query()
+    
+
+    return render_template('multi_progress_plot.html', 
+                           url='/static/images/multi_progress_plot.png', sun_mon_plot= sun_mon_plot)
+
 
     
 
