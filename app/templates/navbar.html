@@ -10,6 +10,8 @@
 
       </span>
 
+
+
       <ul class="navbar-nav">
 
          <li class="nav-item active"> 
@@ -26,7 +28,6 @@
          </li>
 
          
-
         
 
          <li class="nav-item">
@@ -43,6 +44,8 @@
       
 
    </div>
+
+</nav>
 
 
 <!-- Modal  for inserting a new purchase-->
@@ -101,7 +104,52 @@
 </div>
 
 
+
+
+<!-- Modal  for updating Weekly Learning Goal -->
+ <!-- Personal Notes - div id is crucial -->
+ 
+ <div id="wkly_goal_Modal" class="modal fade" role="dialog" >
+   <div class="modal-dialog" data-bs-theme="dark">
+      <div class="modal-content" >
+         <div class="modal-header">
+            <h4 class="modal-title">Add Session </h4>
+         </div>
+         <div class="modal-body">
+
+            <form action="{{url_for('wkly_goal')}}" method="POST">
+
+
+              <div class="form-group">
+                 <label>Week Goal:</label>
+                 <h6 style="color: rgb(2, 3, 41)">Week Goal</h6>
+                 <input type="number" class="form-control" name="week_goal" required="1">
+             </div>
+
+               <div class="form-group">
+                  <button class="btn btn-primary mt-4" type="submit">Submit</button>
+               </div>
+
+
+            </form>
+
+
+         </div>
+
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+         </div>
+
+      </div>
+   </div>
+
+
+</div>
+
+
   
-</nav>
+
 
 

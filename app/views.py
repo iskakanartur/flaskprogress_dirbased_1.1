@@ -62,6 +62,21 @@ def update():
         return redirect(url_for('index'))
     
 
+##### Set Weekly Learning Goal from Navbar
+@app.route('/week_goal/', methods = ['POST'])
+def wkly_goal():
+    if request.method =='POST':
+    
+        goal = various(
+            datetime = request.form.get('datetime'),
+            week_goal = request.form.get('week_goal')
+        )
+        db.session.add(goal)
+        db.session.commit()
+        flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
+        return redirect(url_for('index'))
+    
+
 
 
 
