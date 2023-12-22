@@ -27,6 +27,17 @@
             <a class="nav-link" href="{{ url_for('multi_progress_plot') }}">Multi Plot</a>
          </li>
 
+
+         <li class="nav-item active"> 
+            <a class="nav-link" href="{{ url_for('fitness_overview') }}">Fit</a>
+         </li>
+
+         <li class="nav-item active"> 
+            <a class="nav-link" href="{{ url_for('nutrition_overview') }}">Nutrition</a>
+         </li>
+
+         
+
          
         
 
@@ -35,8 +46,18 @@
          </li>
 
 
+
          <li class="nav-item">
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#wkly_goal_Modal">Week Target</button>
+         </li>
+
+
+         <li class="nav-item">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#insert_fitness_modal">Add Fit </button>
+         </li>
+
+         <li class="nav-item">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#insert_meal_modal">Add Meal </button>
          </li>
          
 
@@ -128,6 +149,128 @@
 
                <div class="form-group">
                   <button class="btn btn-primary mt-4" type="submit">Submit</button>
+               </div>
+
+
+            </form>
+
+
+         </div>
+
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+         </div>
+
+      </div>
+   </div>
+
+
+</div>
+
+
+
+
+
+<!-- Modal  for inserting a new Fitness Event -->
+<div id="insert_fitness_modal" class="modal fade" role="dialog" >
+   <div class="modal-dialog" data-bs-theme="dark">
+      <div class="modal-content" >
+         <div class="modal-header">
+            <h4 class="modal-title">Add Fitness Event </h4>
+         </div>
+         <div class="modal-body">
+
+            <form action="{{url_for('insert_fitness')}}" method="POST">
+
+
+               <div class="form-group">
+                  <label>Exercise:</label>
+                  <h6 style="color: rgb(2, 3, 41)">Exercise</h6>
+                  <input type="text" color = #377ba8   class="form-control" name="exercise" required="1">
+               </div>
+
+
+              <div class="form-group">
+                  <label>Count:</label>
+                  <h6 style="color: rgb(2, 3, 41)">Count</h6>
+                  <input type="number" class="form-control" name="count" required="1">
+              </div>
+
+              <div class="form-group">
+                  <label>comment:</label>
+                  <h6 style="color: rgb(2, 3, 41)">Comments</h6>
+                  <input type="text" class="form-control" name="comment">
+              </div>
+
+
+
+               <div class="form-group">
+                  <button class="btn btn-primary mt-4" type="submit">Add Fitness</button>
+               </div>
+
+
+            </form>
+
+
+         </div>
+
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+         </div>
+
+      </div>
+   </div>
+
+
+</div>
+
+
+
+<!-- Modal  for inserting a new Meal -->
+<div id="insert_meal_modal" class="modal fade" role="dialog" >
+   <div class="modal-dialog" data-bs-theme="dark">
+      <div class="modal-content" >
+         <div class="modal-header">
+            <h4 class="modal-title">Add Meal </h4>
+         </div>
+         <div class="modal-body">
+
+            <form action="{{url_for('insert_nutrition')}}" method="POST">
+
+
+               <div class="form-group">
+                  <label>Meal:</label>
+                  <h6 style="color: rgb(2, 3, 41)">Meal</h6>
+                  <input type="text" color = #377ba8   class="form-control" name="meal" required="1">
+               </div>
+
+
+              <div class="form-group">
+                  <label>Drink:</label>
+                  <h6 style="color: rgb(2, 3, 41)">Drink</h6>
+                  <input type="text" class="form-control" name="drink">
+              </div>
+
+              <div class="form-group">
+                  <label>Drink Count:</label>
+                   <h6 style="color: rgb(2, 3, 41)">Drink Count</h6>
+                   <input type="number" class="form-control" name="drink_count">
+              </div>
+
+              <div class="form-group">
+                  <label>comment:</label>
+                  <h6 style="color: rgb(2, 3, 41)">Comments</h6>
+                  <input type="text" class="form-control" name="comment">
+              </div>
+
+
+
+               <div class="form-group">
+                  <button class="btn btn-primary mt-4" type="submit">Add Meal</button>
                </div>
 
 

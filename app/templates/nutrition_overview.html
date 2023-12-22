@@ -1,0 +1,154 @@
+<!----------------------------NUTRITION OVERVIEW ------------------------ -->
+
+{% extends 'base.html' %}
+
+
+{% block title %} 
+    Home 
+{% endblock %}
+
+
+{% block body %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">Panel Heading</div>
+      <div class="panel-body"></div>
+  </div>
+
+
+
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success" role="alert">
+                        {{message}}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+        {% endwith %}
+
+
+        <table class="table table-success table-striped table-hover table-dark" border="0.2">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Meal</th>
+                    <th>Drink</th>
+                    <th>Drink Count</th>
+                    <th>Date Added</th>
+                    <th>Comments</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+                {% for query in nutrition_query_all  %}
+                    <tr>
+                        <td>{{query.id}}</td>
+                        <td>{{query.meal}}</td>
+                        <td>{{query.drink}}</td>
+                        <td>{{query.drink_count}}</td>
+                        <td>{{query.date_added.strftime('%Y-%m-%d')}}</td>
+                        <td>{{query.comment}}</td>
+                        <td>
+                            <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaledit{{query.id}}">Update</a>
+                            <a href="" class="btn btn-danger" onclick="return confirm('Sure to delete?')">Delete</a>
+                        </td>
+                    </tr>
+
+
+
+
+
+
+ <!-- update model -->
+ <div id="modaledit{{query.id}}" class="modal fade" role="dialog">
+    <div class="modal-dialog" >
+       <div class="modal-content"  style="background-color: #273746;">
+          <div class="modal-header" style="background-color: #273746;">
+             <h4 class="modal-title">Update Meal</h4>
+          </div>
+          <div class="modal-body" style="background-color: #273746;">
+ 
+             <form action="{{url_for('update_nutrition')}}" method="POST">
+ 
+ 
+                <div class="form-group">
+ 
+                   <label>Meal:</label>
+                    <input type="hidden"  name="id" value="{{query.id}}">
+                   <input type="text" class="form-control" name="meal" value="{{query.meal}}" >
+ 
+                </div>
+ 
+ 
+ 
+                 <div class="form-group">
+                   <label>Drink:</label>
+                   <input type="text" class="form-control" name="drink" value="{{query.drink}}">
+                </div>
+
+                <div class="form-group">
+                    <label>Drink Count:</label>
+                    <input type="number" class="form-control" name="drink_count" value="{{query.drink_count}}">
+                 </div>
+ 
+                  <div class="form-group">
+                   <label>Date Added:</label>
+                   <input type="date" class="form-control" name="date_added" value="{{query.date_added}}">
+                </div>
+
+                <div class="form-group">
+                    <label>Comment:</label>
+                    <input type="text" class="form-control" name="comment" value="{{query.comment}}">
+                 </div>
+ 
+                <div class="form-group">
+                   <button class="btn btn-primary mt-4" type="submit">Update</button>
+                </div>
+ 
+ 
+             </form>
+ 
+ 
+          </div>
+ 
+ 
+          <div class="modal-footer">
+             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+ 
+          </div>
+ 
+ 
+       </div>
+ 
+ 
+    </div>
+ 
+ 
+ </div>
+
+
+
+
+
+                 
+
+
+
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+
+

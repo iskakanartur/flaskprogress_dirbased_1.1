@@ -37,8 +37,16 @@ def multi_progress_plot_viz ():
     subjects = subj_total()                         ## Get the ('subj_name', hours_learned) touple
     data =  [i[1] for i in subjects if i[1]!= None] ## Get the hours_total from the tuple
 
-    weekly_learning_total = get_last_weekly_goal()                    ## Weekly Total Learning Goal  for all subjects
-    full_circle_each_subj = weekly_learning_total/(len(data))         ## Average Hours for each Subject from 600 hrs
+   
+    
+
+    weekly_learning_total = get_last_weekly_goal() ## Weekly Total Learning Goal  for all subjects
+
+    if len (data ) < 1:
+       full_circle_each_subj =100000
+    else : 
+        full_circle_each_subj = weekly_learning_total/(len(data))        ## If empty records you have division by 0 error
+
     progress_full_circle_each_subj = [i/full_circle_each_subj*100 for i in data]   ## % cmplete
 
 
@@ -91,5 +99,6 @@ def multi_progress_plot_viz ():
 
 
     plt.savefig('app/static/images/multi_progress_plot.png') ## Careful with relative and absolute paths
+    # print (weekly_learning_total, full_circle_each_subj, subject_titles)
     
     # plt.show()

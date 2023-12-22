@@ -20,6 +20,21 @@ class Learn(db.Model):
     comment = db.Column(db.String(150), nullable=True)
 
 
+class fit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    exercise = db.Column(db.String(150), nullable=False)
+    count = db.Column(db.Integer)
+    date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    comment = db.Column(db.String(150), nullable=True)
+
+class eat(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    meal = db.Column(db.String(500), nullable=False)
+    drink = db.Column(db.String(500), nullable=False)
+    drink_count = db.Column(db.Integer)
+    date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    # fasted = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    comment = db.Column(db.String(150), nullable=True)
 
 
 
