@@ -41,6 +41,7 @@
                     <th>Drink Count</th>
                     <th>Date Added</th>
                     <th>Comments</th>
+                    <td>Fasted</td>
                     <th colspan="2">Actions</th>
                 </tr>
             </thead>
@@ -53,8 +54,9 @@
                         <td>{{query.meal}}</td>
                         <td>{{query.drink}}</td>
                         <td>{{query.drink_count}}</td>
-                        <td>{{query.date_added.strftime('%Y-%m-%d')}}</td>
+                        <td>{{query.date_added.strftime('%Y-%m-%d %H:%M')}}</td>
                         <td>{{query.comment}}</td>
+                        <td>{{query.time_delta}}</td>
                         <td>
                             <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaledit{{query.id}}">Update</a>
                             <a href="" class="btn btn-danger" onclick="return confirm('Sure to delete?')">Delete</a>

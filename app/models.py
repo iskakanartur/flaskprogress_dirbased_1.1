@@ -33,7 +33,7 @@ class eat(db.Model):
     drink = db.Column(db.String(500), nullable=False)
     drink_count = db.Column(db.Integer)
     date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    # fasted = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    time_delta = db.Column(db.Interval)
     comment = db.Column(db.String(150), nullable=True)
 
 

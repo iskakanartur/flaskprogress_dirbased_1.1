@@ -1,8 +1,12 @@
 from app import app, db
 from app.models import *
-from sqlalchemy import func,  and_      ### to combine db queries in past Mo to su function 
+import sqlalchemy
+
+from sqlalchemy import func, text
+from datetime import timedelta, date, datetime
+
+from sqlalchemy import and_      ### to combine db queries in past Mo to su function 
 from calendar import monthrange  ### to combine db queries in past Mo to su function 
-from datetime import date, datetime, timedelta
 
 
 
@@ -63,4 +67,47 @@ def subj_total ():
     return (subj_total_sum_mo_su)
 
 
- 
+
+
+################################ Helpers For The Nutrition Module ######################
+
+def query_fasted_time ():
+
+    subquery = db.session.query(
+    eat.date_added.cast(db.Date).label('date'),
+    func.min(eat.date_added).label('first_record'),
+    func.max(eat.date_added).label('last_record') ).group_by('date').subquery()
+
+    query = db.session.query(subquery.c.date, 
+                             (subquery.c.first_record - 
+                            func.lag(subquery.c.last_record).over(order_by=subquery.c.date)).label('time_delta')
+                           )
+    
+
+    # Get time delta in seconds to calculated total fasted time
+    for row in query:
+        if row.time_delta is not None:
+        # Convert the time delta to hours and minutes
+            total_seconds = row.time_delta.total_seconds()
+            hours, remainder = divmod(total_seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+
+            # print(f"Date: {row.date}, Time Delta: {int(hours)} hours and {int(minutes)} minutes")
+
+
+    # Write time delta to the DB, optimize or change later 
+    today = datetime.now().date()
+    # Get the first record of today
+    record = db.session.query(eat).filter(func.date(eat.date_added) == today).order_by(eat.date_added).first()
+    ## Count number of rows if one row for meal means it is OMAD
+    record_count =  db.session.query(eat).filter(func.date(eat.date_added) == today).order_by(eat.date_added).count()
+    if record:
+        # Update the time_delta field with total_seconds
+        record.time_delta = timedelta(seconds=total_seconds)
+        # Commit the changes
+        db.session.commit()
+
+    # print (record_count)
+    
+
+

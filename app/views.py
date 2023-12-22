@@ -179,6 +179,8 @@ def insert_nutrition():
             drink_count =   request.form.get('drink_count'),
             date_added = request.form.get('date_added'),
             comment =    request.form.get('comment')
+            
+
         )
         db.session.add(session)
         db.session.commit()
