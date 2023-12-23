@@ -12,6 +12,8 @@ from datetime import date, datetime, timedelta
 ######## For Multi Plot Progress Bar
 from app.visualization import *
 
+from sqlalchemy import cast, Date
+
 
 
 
@@ -170,22 +172,59 @@ def nutrition_overview():
 
 
 ##### ADD NUTRITION 
+## ADD FUnctionality to trigger   query_fasted_time ()
+## IF It is the first record of today RUn the function.
 @app.route('/add_nutrition/', methods = ['POST'])
 def insert_nutrition():
-    if request.method =='POST':
-        session = eat(
-            meal =    request.form.get('meal'),
-            drink =   request.form.get('drink'),
-            drink_count =   request.form.get('drink_count'),
-            date_added = request.form.get('date_added'),
-            comment =    request.form.get('comment')
-            
 
-        )
-        db.session.add(session)
-        db.session.commit()
-        flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
-        return redirect(url_for('nutrition_overview'))
+    # Check if there are any records in the Eat model as of the current time
+    # Create a subquery from the Select object
+    #exists = db.session.query(eat.query.filter(cast(eat.date_added, Date) >= datetime.now().date())).exists()
+
+    exists = db.session.query(
+    db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()).scalar()
+
+    if exists:
+    # No need to trigger Fasting Time Calc function query_fasted_time ()
+        if request.method =='POST':
+            session = eat(
+                meal =    request.form.get('meal'),
+                drink =   request.form.get('drink'),
+                drink_count =   request.form.get('drink_count'),
+                date_added = request.form.get('date_added'),
+                comment =    request.form.get('comment')
+                    )
+            db.session.add(session)
+            db.session.commit()
+            flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
+            return redirect(url_for('nutrition_overview'))
+        
+    else: # Calculate Fasting Time
+        
+        if request.method =='POST':
+            session = eat(
+                meal =    request.form.get('meal'),
+                drink =   request.form.get('drink'),
+                drink_count =   request.form.get('drink_count'),
+                date_added = request.form.get('date_added'),
+                comment =    request.form.get('comment')
+                    )
+            db.session.add(session)
+            db.session.commit()
+            flash("Fasting Time Calculated")
+            query_fasted_time () # Calculate Fasting Time
+        
+        
+            return redirect(url_for('nutrition_overview'))
+        
+         
+
+        
+
+
+
+
+       
     
 
 ##### UPDATE NUTRITION !!!!!!!!!! ATTENTION ERROR HANDLING !!!!!!

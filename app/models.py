@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy import Numeric
 
 from sqlalchemy import func, event, DDL
 
@@ -24,6 +25,7 @@ class fit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise = db.Column(db.String(150), nullable=False)
     count = db.Column(db.Integer)
+    weight = db.Column(Numeric(precision=10, scale=2))
     date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
     comment = db.Column(db.String(150), nullable=True)
 
