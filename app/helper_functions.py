@@ -97,17 +97,13 @@ def query_fasted_time ():
 
     # Write time delta to the DB, optimize or change later 
     today = datetime.now().date()
-    # Get the first record of today
-    record = db.session.query(eat).filter(func.date(eat.date_added) == today).order_by(eat.date_added).first()
+    
     ## Count number of rows if one row for meal means it is OMAD
-    record_count =  db.session.query(eat).filter(func.date(eat.date_added) == today).order_by(eat.date_added).count()
-    if record:
-        # Update the time_delta field with total_seconds
-        record.time_delta = timedelta(seconds=total_seconds)
-        # Commit the changes
+    most_recent_eat = eat.query.order_by(eat.date_added.desc()).first()
+    if most_recent_eat:
+        most_recent_eat.time_delta = timedelta(seconds=total_seconds)
         db.session.commit()
 
-    # print (record_count)
     
 
 

@@ -36,8 +36,10 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Exercise</th>
-                    <th>Count</th>
+                    <th>Weight</th>
+                    <th>Weist</th>
+                    <th>Bicep</th>
+                    <th>Glucose</th>
                     <th>Date</th>
                     <th>Comments</th>
                     <th colspan="2">Actions</th>
@@ -46,11 +48,13 @@
             <tbody>
 
 
-                {% for query in fit_query_all %}
+                {% for query in body_query_all %}
                     <tr>
                         <td>{{query.id}}</td>
-                        <td>{{query.exercise}}</td>
-                        <td>{{query.count}}</td>
+                        <td>{{query.weight}}</td>
+                        <td>{{query.weist}}</td>
+                        <td>{{query.bicep}}</td>
+                        <td>{{query.glucose}}</td>
                         <td>{{query.date_added.strftime('%Y-%m-%d')}}</td>
                         <td>{{query.comment}}</td>
                         <td>
@@ -74,23 +78,31 @@
           </div>
           <div class="modal-body" style="background-color: #273746;">
  
-             <form action="{{url_for('update_fitness')}}" method="POST">
+             <form action="{{url_for('update_body')}}" method="POST">
  
  
                 <div class="form-group">
- 
-                   <label>Exercise </label>
+                   <label>Weight </label>
                     <input type="hidden"  name="id" value="{{query.id}}">
-                   <input type="text" class="form-control" name="exercise" value="{{query.exercise}}" >
- 
+                   <input type="number" class="form-control" name="weight" value="{{query.weight}}" >
                 </div>
  
  
  
                  <div class="form-group">
-                   <label>Count:</label>
-                   <input type="text" class="form-control" name="Count" value="{{query.count}}">
+                   <label>Weist:</label>
+                   <input type="number" class="form-control" name="weist" value="{{query.weist}}">
                 </div>
+
+                <div class="form-group">
+                    <label>Bicep:</label>
+                    <input type="number" class="form-control" name="bicep" value="{{query.bicep}}">
+                 </div>
+
+                 <div class="form-group">
+                    <label>Glucose:</label>
+                    <input type="number" class="form-control" name="glucose" value="{{query.glucose}}">
+                 </div>
  
                   <div class="form-group">
                    <label>date_added:</label>

@@ -17,6 +17,19 @@ from sqlalchemy import cast, Date
 
 
 
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.fields  import DateTimeLocalField
+from wtforms.validators import DataRequired
+from datetime import datetime
+
+from wtforms.fields import DateTimeLocalField
+
+
+
+
+
+
 ############################################### Views for Goal Tracking App ###################################
 
 @app.route('/')
@@ -160,74 +173,61 @@ def update_fitness():
 
 
 ############################################## Views for Nutrition  App ###################################
-    
-@app.route('/nutrition_overview')
-def nutrition_overview():
+## Class NutritionForm(FlaskForm) and WTF is used for the ability to 
+## Manually insert datetime If a meal was eaten at earlier time than Database NOW()
 
+
+class NutritionForm(FlaskForm):
+    meal = StringField('Meal', validators=[DataRequired()])
+    drink = StringField('Drink', validators=[DataRequired()])
+    drink_count = StringField('Drink Count', validators=[DataRequired()])
+    date_added = DateTimeLocalField('Date Added', format='%Y-%m-%dT%H:%M:%S', default=datetime.now, render_kw={"placeholder": "Optional"})
+    comment = StringField('Comment')
+    submit = SubmitField('Add Nutrition')
+
+@app.route('/nutrition_index')
+def nutrition_index():
     nutrition_query_all = eat.query.order_by(eat.date_added.asc()).all()
+    return render_template('nutrition_index.html', nutrition_query_all=nutrition_query_all )
 
-
-    return render_template('nutrition_overview.html', nutrition_query_all=nutrition_query_all )
-
-
-
-##### ADD NUTRITION 
-## ADD FUnctionality to trigger   query_fasted_time ()
-## IF It is the first record of today RUn the function.
 @app.route('/add_nutrition/', methods = ['POST'])
 def insert_nutrition():
-
-    # Check if there are any records in the Eat model as of the current time
-    # Create a subquery from the Select object
-    #exists = db.session.query(eat.query.filter(cast(eat.date_added, Date) >= datetime.now().date())).exists()
-
     exists = db.session.query(
     db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()).scalar()
 
     if exists:
-    # No need to trigger Fasting Time Calc function query_fasted_time ()
         if request.method =='POST':
             session = eat(
                 meal =    request.form.get('meal'),
                 drink =   request.form.get('drink'),
                 drink_count =   request.form.get('drink_count'),
-                date_added = request.form.get('date_added'),
+                # or is used to insert now() if the field is empty
+                date_added=request.form.get('date_added') or func.now(), 
                 comment =    request.form.get('comment')
                     )
             db.session.add(session)
             db.session.commit()
-            flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
-            return redirect(url_for('nutrition_overview'))
+            return redirect(url_for('nutrition_index'))
         
-    else: # Calculate Fasting Time
+    else:
         
         if request.method =='POST':
             session = eat(
                 meal =    request.form.get('meal'),
                 drink =   request.form.get('drink'),
                 drink_count =   request.form.get('drink_count'),
-                date_added = request.form.get('date_added'),
+                date_added = request.form.get('date_added')  or func.now(),
                 comment =    request.form.get('comment')
                     )
             db.session.add(session)
             db.session.commit()
-            flash("Fasting Time Calculated")
-            query_fasted_time () # Calculate Fasting Time
-        
-        
-            return redirect(url_for('nutrition_overview'))
-        
-         
+            query_fasted_time ()
+            return redirect(url_for('nutrition_index'))
 
-        
-
-
-
-
-       
     
 
 ##### UPDATE NUTRITION !!!!!!!!!! ATTENTION ERROR HANDLING !!!!!!
+            
 @app.route('/update_nutrition/', methods = ['POST'])
 def update_nutrition():
     if request.method == "POST":
@@ -243,7 +243,83 @@ def update_nutrition():
         
         db.session.commit()
         flash("Գնումը Գրանցված է")
-        return redirect(url_for('nutrition_overview'))
+        return redirect(url_for('nutrition_index'))
+    
+
+#### Delete Nutrition 
+@app.route('/delete_nutrition/<int:id>', methods=['POST'])
+def delete_nutrition(id):
+    eat_to_delete = eat.query.get_or_404(id)
+    if request.method == 'POST':
+        if request.form.get('confirm') == 'Yes':
+            db.session.delete(eat_to_delete)
+            db.session.commit()
+            flash('Row deleted successfully', 'success')
+        else:
+            flash('Deletion cancelled', 'warning')
+        return redirect(url_for('nutrition_index'))
+    return render_template('delete_nutrition.html', eat_to_delete=eat_to_delete)
+
+    
+
+
+############################################## Views for BODY  App ###################################
+    
+@app.route('/body_index')
+def body_index():
+
+    body_query_all = body.query.order_by(body.date_added.asc()).all()
+
+    return render_template('body_index.html', body_query_all=body_query_all )
+
+    
+##### ADD  BODY PARAMS
+@app.route('/add_body/', methods = ['POST'])
+def insert_body():
+    if request.method =='POST':
+        session = body(
+            weight =    request.form.get('weight'),
+            weist =     request.form.get('weist'),
+            bicep =     request.form.get('bicep'),
+            glucose =   request.form.get('glucose'),
+            date_added = request.form.get('date_added'),
+            comment =    request.form.get('comment')
+        )
+        db.session.add(session)
+        db.session.commit()
+        flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
+        return redirect(url_for('body_index'))
+
+
+##### UPDATE BODY
+@app.route('/update_body/', methods = ['POST'])
+def update_body():
+    if request.method == "POST":
+        my_data = body.query.get( request.form['id'] ) ## Compare this to the index
+
+        my_data.weight = request.form['weight']
+        my_data.weist = request.form['weist']
+        my_data.bicep = request.form['bicep']
+        my_data.glucose = request.form['glucose']
+        
+        my_data.date_added = request.form['date_added']
+        my_data.comment = request.form['comment']
+        
+        
+        db.session.commit()
+        flash("Գնումը Գրանցված է")
+        return redirect(url_for('body_index'))
+        # return redirect(url_for('index'))
+    
+
+def lo ():
+    exists = db.session.query(
+        db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()).scalar()
+    print (exists)
+        
+
+
+
     
     
 

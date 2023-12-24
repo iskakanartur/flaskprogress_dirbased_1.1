@@ -25,9 +25,26 @@ class fit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise = db.Column(db.String(150), nullable=False)
     count = db.Column(db.Integer)
-    weight = db.Column(Numeric(precision=10, scale=2))
     date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
     comment = db.Column(db.String(150), nullable=True)
+
+
+class body(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    #weight = db.Column(Numeric(precision=10, scale=2))
+    #weist =  db.Column(Numeric(precision=10, scale=2))
+    #bicep =  db.Column(Numeric(precision=10, scale=2))
+    # glucose = db.Column(Numeric(precision=10, scale=2))
+
+    weight = db.Column(db.Float(precision=4), nullable=True)
+    weist = db.Column(db.Float(precision=4), nullable=True)
+    bicep = db.Column(db.Float(precision=4), nullable=True)
+    glucose = db.Column(db.Float(precision=4), nullable=True)
+
+    date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    comment = db.Column(db.String(150), nullable=True)
+
 
 class eat(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -56,10 +56,24 @@
                         <td>{{query.drink_count}}</td>
                         <td>{{query.date_added.strftime('%Y-%m-%d %H:%M')}}</td>
                         <td>{{query.comment}}</td>
-                        <td>{{query.time_delta}}</td>
+                        {% if query.time_delta %}
+                            {% if query.time_delta.days == 0 %}
+                                <td>{{ query.time_delta.seconds//3600 }}Hr : {{ (query.time_delta.seconds//60)%60 }}Min </td>
+                            {% else %}
+                                <td>{{ query.time_delta.days }} days, {{ query.time_delta.seconds//3600 }}Hr : {{ (query.time_delta.seconds//60)%60 }}Min</td>
+                            {% endif %}
+                        {% else %}
+                            <td>No Data</td>
+                        {% endif %}
+
                         <td>
                             <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaledit{{query.id}}">Update</a>
-                            <a href="" class="btn btn-danger" onclick="return confirm('Sure to delete?')">Delete</a>
+
+                            <form action="{{ url_for('delete_nutrition', id=query.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this row?')">Delete</button>
+                                <input  type="hidden" name="confirm" value="Yes">
+                            </form>
+                            <!-- <a href="" class="btn btn-danger" onclick="return confirm('Sure to delete?')">Delete</a> -->
                         </td>
                     </tr>
 
@@ -101,8 +115,8 @@
                  </div>
  
                   <div class="form-group">
-                   <label>Date Added:</label>
-                   <input type="date" class="form-control" name="date_added" value="{{query.date_added}}">
+                   <label>Modify Date Added:</label>
+                   <input type="datetime-local" class="form-control" name="date_added" value="{{query.date_added}}">
                 </div>
 
                 <div class="form-group">
