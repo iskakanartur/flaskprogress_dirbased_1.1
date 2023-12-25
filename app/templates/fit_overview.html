@@ -1,153 +1,134 @@
-<!----------------------------EXPENSES NEW ADAPTATION ------------------------ -->
+<!----------------------------FIT OVERVIEW ------------------------ -->
 
 {% extends 'base.html' %}
-
 
 {% block title %} 
     Home 
 {% endblock %}
 
-
 {% block body %}
+
+<!-- Load the page scrolled down  -->
+<script>
+    window.onload = function() {
+        var div = document.getElementById('scrollTable');
+        div.scrollTop = div.scrollHeight - div.clientHeight;
+    }
+</script>
+
+<style>
+    /* Add CSS styles for table and container */
+    .table-container {
+        margin-top: 200px;
+    }
+
+    /* Sticky header for the table */
+    .table-sticky thead th {
+        position: sticky;
+        top: 0;
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+    }
+</style>
+
+
 
 <div class="panel panel-default">
     <div class="panel-heading">Panel Heading</div>
-      <div class="panel-body"></div>
-  </div>
+    <div class="panel-body"></div>
+</div>
+
+<div class="container mt-4 table-container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
 
+    <div  id="scrollTable" style="height:500px;overflow:auto;margin-top:200px;">    <!-- Load the page scrolled down  -->
+    <table class="table table-success table-striped table-hover table-dark table-sticky" border="0.2">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Exercise</th>
+                <th>Count</th>
+                <th>Comments</th>
+                <th>Date Added</th>
+                <th colspan="2">Actions</th>
+            </tr>
+        </thead>
 
-
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-success" role="alert">
-                        {{message}}
-                    </div>
-
-                {% endfor %}
-
-            {% endif %}
-        {% endwith %}
-
-
-<div style="height:500px;overflow:auto;margin-top:200px;">    
-<table class="table table-success table-striped table-hover table-dark" border="0.2">
-            <thead>
+        <tbody>
+            {% for query in fit_query_all %}
                 <tr>
-                    <th>ID</th>
-                    <th>Exercise</th>
-                    <th>Count</th>
-                    <th>Date</th>
-                    <th>Comments</th>
-                    <th colspan="2">Actions</th>
+                    <td>{{query.id}}</td>
+                    <td>{{query.exercise}}</td>
+                    <td>{{query.count}}</td>
+                    <td>{{query.comment}}</td>
+                    <td>{{query.date_added.strftime('%Y-%m-%d %H:%M')}}</td>
+                    <td>
+                        <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaledit{{query.id}}">Update</a>
+                        <form action="{{ url_for('delete_nutrition', id=query.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this row?')">Delete</button>
+                            <input type="hidden" name="confirm" value="Yes">
+                        </form>
+                    </td>
                 </tr>
-            </thead>
 
-    <tbody>
-
-
-    {% for query in fit_query_all %}
-                    <tr>
-                        <td>{{query.id}}</td>
-                        <td>{{query.exercise}}</td>
-                        <td>{{query.count}}</td>
-                        <td>{{query.date_added.strftime('%Y-%m-%d')}}</td>
-                        <td>{{query.comment}}</td>
-                        <td>
-                            <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaledit{{query.id}}">Update</a>
-                            <a href="" class="btn btn-danger" onclick="return confirm('Sure to delete?')">Delete</a>
-                        </td>
-                    </tr>
+                <!-- update model -->
+                <!-- update model -->
+                <div id="modaledit{{query.id}}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="background-color: #273746;">
+                            <div class="modal-header" style="background-color: #273746;">
+                                <h4 class="modal-title">Update Meal</h4>
+                            </div>
+                            <div class="modal-body" style="background-color: #273746;">
 
 
-                 
+                                <form action="{{url_for('update_fitness')}}" method="POST">
+                                    <div class="form-group">
+                                        <label>Exercise:</label>
+                                        <input type="hidden"  name="id" value="{{query.id}}">
+                                        <input type="text" class="form-control" name="exercise" value="{{query.exercise}}" >
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Count:</label>
+                                        <input type="number" class="form-control" name="count" value="{{query.count}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Comment:</label>
+                                        <input type="text" class="form-control" name="comment" value="{{query.comment}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Modify Date Added:</label>
+                                        <input type="datetime-local" class="form-control" name="date_added" value="{{query.date_added}}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button class="btn btn-primary mt-4" type="submit">Update</button>
+                                    </div>
+                                </form>
 
 
-
-
- <!-- update model -->
- <div id="modaledit{{query.id}}" class="modal fade" role="dialog">
-    <div class="modal-dialog" >
-       <div class="modal-content"  style="background-color: #273746;">
-          <div class="modal-header" style="background-color: #273746;">
-             <h4 class="modal-title">Update</h4>
-          </div>
-          <div class="modal-body" style="background-color: #273746;">
- 
-             <form action="{{url_for('update_fitness')}}" method="POST">
- 
- 
-                <div class="form-group">
- 
-                   <label>Exercise </label>
-                    <input type="hidden"  name="id" value="{{query.id}}">
-                   <input type="text" class="form-control" name="exercise" value="{{query.exercise}}" >
- 
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
- 
- 
- 
-                 <div class="form-group">
-                   <label>Count:</label>
-                   <input type="text" class="form-control" name="Count" value="{{query.count}}">
-                </div>
- 
-                  <div class="form-group">
-                   <label>date_added:</label>
-                   <input type="date" class="form-control" name="date_added" value="{{query.date_added}}">
-                </div>
+                <!--END OF  update model -->
 
-                <div class="form-group">
-                    <label>Comment:</label>
-                    <input type="datetime" class="form-control" name="comment" value="{{query.comment}}">
-                 </div>
-
- 
-                <div class="form-group">
-                   <button class="btn btn-primary mt-4" type="submit">Update</button>
-                </div>
- 
- 
-             </form>
- 
- 
-          </div>
- 
- 
-          <div class="modal-footer">
-             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
- 
-          </div>
- 
- 
-       </div>
- 
- 
-    </div>
- 
- 
- </div>
-
-
-
-
-
-
-
-
-
-
-    {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-
-
+                <!--END OF  update model -->
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
-
-
-

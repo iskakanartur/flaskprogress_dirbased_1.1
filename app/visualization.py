@@ -102,3 +102,39 @@ def multi_progress_plot_viz ():
     # print (weekly_learning_total, full_circle_each_subj, subject_titles)
     
     # plt.show()
+
+
+
+
+
+
+
+
+
+
+################### VIUSALIZATIONS FOR THE FIT APPP ############################
+def weekly_exercise_summary_bar ():
+    # Get the date a week ago
+    week_ago = datetime.now() - timedelta(days=7)
+
+    # <= in the first clause (func.date_tunc) makes it monday to monday
+    mo_su = db.session.query(Learn).filter (and_
+                (Learn.date_added <= func.date_trunc('week', func.now( ) ), 
+                 Learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(Learn.date_added )
+
+    # Query the database
+    data = db.session.query(fit.exercise, func.sum(fit.count)).filter(fit.date_added >= week_ago).group_by(fit.exercise).all()
+
+    # Convert the data to a DataFrame
+    df = pd.DataFrame(data, columns=['Exercise', 'Count'])
+
+    # Create the plot
+    df.plot(kind='bar', x='Exercise', y='Count', legend=False)
+    plt.ylabel('Count')
+    plt.title('Exercise Count in the Past Week')
+
+    # Show the plot
+    plt.show()
+
+
+    

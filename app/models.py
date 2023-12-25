@@ -32,11 +32,7 @@ class fit(db.Model):
 class body(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    #weight = db.Column(Numeric(precision=10, scale=2))
-    #weist =  db.Column(Numeric(precision=10, scale=2))
-    #bicep =  db.Column(Numeric(precision=10, scale=2))
-    # glucose = db.Column(Numeric(precision=10, scale=2))
-
+    
     weight = db.Column(db.Float(precision=4), nullable=True)
     weist = db.Column(db.Float(precision=4), nullable=True)
     bicep = db.Column(db.Float(precision=4), nullable=True)

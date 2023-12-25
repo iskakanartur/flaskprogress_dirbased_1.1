@@ -104,6 +104,23 @@ def query_fasted_time ():
         most_recent_eat.time_delta = timedelta(seconds=total_seconds)
         db.session.commit()
 
+
+
+
+################# FOR FIT SUMMARY STATISTICS
+def fit_exercise_stats_mo_su ():
+
+    # <= in the first clause (func.date_tunc) makes it monday to monday
+    mo_su = db.session.query(fit).filter (and_
+                (fit.date_added <= func.date_trunc('week', func.now( ) ), 
+                 Learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(fit.date_added )
+    
+    # Print the results
+    for record in mo_su:
+        print(f"ID: {record.id}, Exercise: {record.exercise}, Count: {record.count}, Date Added: {record.date_added}, Comment: {record.comment}")
+
+   
+
     
 
 
