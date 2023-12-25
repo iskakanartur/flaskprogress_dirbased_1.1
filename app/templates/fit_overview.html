@@ -32,7 +32,8 @@
         {% endwith %}
 
 
-        <table class="table table-success table-striped table-hover table-dark" border="0.2">
+<div style="height:500px;overflow:auto;margin-top:200px;">    
+<table class="table table-success table-striped table-hover table-dark" border="0.2">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -43,10 +44,11 @@
                     <th colspan="2">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+
+    <tbody>
 
 
-                {% for query in fit_query_all %}
+    {% for query in fit_query_all %}
                     <tr>
                         <td>{{query.id}}</td>
                         <td>{{query.exercise}}</td>
@@ -137,10 +139,13 @@
 
 
 
-                {% endfor %}
+    {% endfor %}
             </tbody>
         </table>
     </div>
+
+
+
 
 {% endblock %}
 

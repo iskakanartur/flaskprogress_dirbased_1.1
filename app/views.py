@@ -156,7 +156,7 @@ def insert_fitness():
 @app.route('/update_fitness/', methods = ['POST'])
 def update_fitness():
     if request.method == "POST":
-        my_data = fit.query.get(request.form.get('id'))
+        my_data = fit.query.get( request.form['id'] ) ## Compare this to the index
 
         my_data.exercise = request.form['exercise']
         my_data.count = request.form['count']
@@ -195,6 +195,7 @@ def insert_nutrition():
     exists = db.session.query(
     db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()).scalar()
 
+    # If There are reocrds for today No need to calculate time delta
     if exists:
         if request.method =='POST':
             session = eat(
@@ -209,6 +210,8 @@ def insert_nutrition():
             db.session.commit()
             return redirect(url_for('nutrition_index'))
         
+    # If no records: This is first meal for today so calc time delta with 
+    # Yesterday's Last Meal 
     else:
         
         if request.method =='POST':
@@ -221,7 +224,7 @@ def insert_nutrition():
                     )
             db.session.add(session)
             db.session.commit()
-            query_fasted_time ()
+            query_fasted_time () # This actually calculates time delta
             return redirect(url_for('nutrition_index'))
 
     
@@ -278,17 +281,24 @@ def body_index():
 def insert_body():
     if request.method =='POST':
         session = body(
-            weight =    request.form.get('weight'),
-            weist =     request.form.get('weist'),
-            bicep =     request.form.get('bicep'),
-            glucose =   request.form.get('glucose'),
-            date_added = request.form.get('date_added'),
-            comment =    request.form.get('comment')
+            weight =    request.form.get('weight') if request.form.get('weight') else None,
+            weist =     request.form.get('weist') if request.form.get('weist') else None,
+            bicep =     request.form.get('bicep') if request.form.get('bicep') else None,
+            glucose =   request.form.get('glucose') if request.form.get('glucose') else None,
+            
+            # or is used to insert now() if the field is empty
+            date_added=request.form.get('date_added') or func.now(), 
+            comment =   request.form.get('comment') if request.form.get('comment') else None
         )
+        
         db.session.add(session)
         db.session.commit()
         flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
         return redirect(url_for('body_index'))
+    
+
+
+    
 
 
 ##### UPDATE BODY
@@ -312,11 +322,19 @@ def update_body():
         # return redirect(url_for('index'))
     
 
-def lo ():
-    exists = db.session.query(
-        db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()).scalar()
-    print (exists)
-        
+#### Delete Body Element  
+@app.route('/delete_body/<int:id>', methods=['POST'])
+def delete_body(id):
+    body_to_delete = body.query.get_or_404(id)
+    if request.method == 'POST':
+        if request.form.get('confirm') == 'Yes':
+            db.session.delete(body_to_delete)
+            db.session.commit()
+            flash('Row deleted successfully', 'success')
+        else:
+            flash('Deletion cancelled', 'warning')
+        return redirect(url_for('body_index'))
+    return render_template('delete_body.html', body_to_delete=body_to_delete)
 
 
 
