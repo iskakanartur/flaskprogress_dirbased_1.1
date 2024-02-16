@@ -24,7 +24,7 @@ class Learn(db.Model):
 class fit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise = db.Column(db.String(150), nullable=False)
-    count = db.Column(db.Integer)
+    exercise_count = db.Column(db.Integer)
     date_added = db.Column(db.DateTime(timezone=True), server_default=func.now())
     comment = db.Column(db.String(150), nullable=True)
 

@@ -14,6 +14,9 @@ from app.visualization import *
 
 from sqlalchemy import cast, Date
 
+from sqlalchemy import distinct
+
+
 
 
 
@@ -24,6 +27,10 @@ from wtforms.validators import DataRequired
 from datetime import datetime
 
 from wtforms.fields import DateTimeLocalField
+
+
+from flask import Flask, render_template
+# from flask_matplotlib import Matplotlib
 
 
 
@@ -124,13 +131,13 @@ def multi_progress_plot ():
 
 
 ############################################## Views for Goal Fitness  App ###################################
-@app.route('/fitness_overview')
-def fitness_overview():
+@app.route('/fitness_index')
+def fitness_index():
 
     fit_query_all = fit.query.order_by(fit.date_added.asc()).all()
 
 
-    return render_template('fit_overview.html', fit_query_all=fit_query_all )
+    return render_template('fitness_index.html', fit_query_all=fit_query_all )
 
 
 
@@ -140,7 +147,7 @@ def insert_fitness():
     if request.method =='POST':
         session = fit(
             exercise =    request.form.get('exercise'),
-            count =   request.form.get('count'),
+            exercise_count =   request.form.get('exercise_count'),
             comment =    request.form.get('comment'),
             date_added = request.form.get('date_added')
             
@@ -149,7 +156,7 @@ def insert_fitness():
         db.session.add(session)
         db.session.commit()
         flash("Ձեր գոնումը հայտնվեց շտեմարանում, Շնորհակալութոյւն")
-        return redirect(url_for('fitness_overview'))
+        return redirect(url_for('fitness_index'))
 
 
 ##### UPDATE FIT
@@ -159,16 +166,128 @@ def update_fitness():
         my_data = fit.query.get( request.form['id'] ) ## Compare this to the index
 
         my_data.exercise = request.form['exercise']
-        my_data.count = request.form['count']
+        my_data.exercise_count = request.form['exercise_count']
         my_data.comment = request.form['comment']
         my_data.date_added = request.form['date_added']
         
         
         db.session.commit()
         flash("Գնումը Գրանցված է")
-        return redirect(url_for('fitness_overview'))
+        return redirect(url_for('fitness_index'))
         # return redirect(url_for('index'))
-        
+    
+
+##### Visualize Daily Exercise Stats WOrking version in temp
+import io
+import base64
+import matplotlib.pyplot as plt
+
+def get_base64_encoded_plot(fig):
+    from sqlalchemy import func, text, extract
+    from sqlalchemy.sql import label
+    from flask_sqlalchemy import SQLAlchemy
+    from datetime import datetime, timedelta
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    from flask import Flask, render_template
+    import matplotlib.pyplot as plt
+    import io
+    import base64
+
+
+
+    # Current date and start of the week
+    current_date = datetime.now()
+    start_of_week = current_date - timedelta(days=current_date.weekday())
+
+    # Query
+    query = db.session.query(
+        label('day_of_week', extract('isodow', fit.date_added)),
+        fit.exercise,
+        label('total_exercise_count', func.sum(fit.exercise_count))
+    ).filter(
+        fit.date_added >= start_of_week,
+        fit.date_added <= current_date + timedelta(days=1)
+    ).group_by(
+        'day_of_week',
+        fit.exercise
+    ).order_by(
+        'day_of_week',
+        text('total_exercise_count DESC')
+    )
+
+    # Execute the query
+    result = query.all()
+
+    # Print the results and prepare data for visualization
+    data = {}
+    for row in result:
+        print(f"Day of Week: {row[0]}, Exercise: {row[1]}, Total Exercise Count: {row[2]}")
+        if row[1] not in data:
+            data[row[1]] = [0]*7
+        data[row[1]][int(row[0])-1] = row[2]
+
+    # Visualization
+    # Visualization
+    fig, ax = plt.subplots(2, 1, figsize=(10, 10))
+
+    # Line plot
+    for exercise, counts in data.items():
+        ax[0].plot(range(1, 8), counts, label=exercise)
+    ax[0].set_xlabel('Day of Week')
+    ax[0].set_ylabel('Total Exercise Count')
+    ax[0].set_title('Exercise Count by Day of Week (Line Plot)')
+    ax[0].set_xticks(range(1, 8))
+    ax[0].set_xticklabels(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+    ax[0].legend()
+
+    # Bar plot
+    bar_width = 0.35
+    index = np.arange(1, 8)
+    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    for i, (exercise, counts) in enumerate(data.items()):
+        ax[1].bar(index + i*bar_width, counts, bar_width, label=exercise)
+    ax[1].set_xlabel('Day of Week')
+    ax[1].set_ylabel('Total Exercise Count')
+    ax[1].set_title('Exercise Count by Day of Week (Bar Plot)')
+    # ax[1].set_xticks(index + bar_width / 2)
+    ax[1].set_xticks(index + bar_width/500 )
+    ax[1].set_xticklabels(days_of_week, rotation=45)
+    ax[1].legend()
+
+    plt.tight_layout()
+    #plt.show()
+
+
+
+    # Convert Matplotlib figure to bytes
+    image_stream = io.BytesIO()
+    plt.savefig(image_stream, format='png')
+    image_stream.seek(0)
+    encoded_image = base64.b64encode(image_stream.read()).decode('utf-8')
+
+    # Return the base64-encoded image directly
+    return encoded_image
+
+
+
+
+
+###### ALTERNATIVE VIEW 
+@app.route('/daily_fit_stats_viz')
+def daily_fit_stats_viz():
+ # Matplotlib code executed in the main thread
+    
+
+    # Return the plot as HTML
+    return render_template('daily_fit_stats_viz.html', encoded_image=encoded_image)
+
+
+
+
+
+
 
 
 

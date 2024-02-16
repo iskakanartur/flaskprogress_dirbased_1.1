@@ -1,4 +1,11 @@
-from flask import render_template
+from flask import Flask, jsonify, render_template
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
+import io
+import base64
+import matplotlib.pyplot as plt
+import mpld3
+
 from app import app, db
 from app.models import *            
 from app.helper_functions import *  ## pay attention to imports  -- from helper_functions import * won't work 
@@ -21,6 +28,9 @@ from flask import Response
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+
+
+
 
 
 
@@ -123,7 +133,7 @@ def weekly_exercise_summary_bar ():
                  Learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(Learn.date_added )
 
     # Query the database
-    data = db.session.query(fit.exercise, func.sum(fit.count)).filter(fit.date_added >= week_ago).group_by(fit.exercise).all()
+    data = db.session.query(fit.exercise, func.sum(fit.exercise_count)).filter(fit.date_added >= week_ago).group_by(fit.exercise).all()
 
     # Convert the data to a DataFrame
     df = pd.DataFrame(data, columns=['Exercise', 'Count'])
@@ -135,6 +145,12 @@ def weekly_exercise_summary_bar ():
 
     # Show the plot
     plt.show()
+
+
+
+
+
+################################### FIT STATS ##################
 
 
     
