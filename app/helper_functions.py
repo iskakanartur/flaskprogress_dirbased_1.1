@@ -87,40 +87,50 @@ def subj_total ():
 
 
 ################################ Helpers For The Nutrition Module ######################
+from datetime import datetime, timedelta
 
-def query_fasted_time ():
+def query_fasted_time():
+    total_seconds = 0  # Initialize total_seconds here
+
+    # Check if there are any records in the 'eat' table
+    if not eat.query.first():
+        print("No records found. Skipping calculation.")
+        # Write time delta to the DB if there are no records
+        today = datetime.now().date()
+        most_recent_eat = eat.query.order_by(eat.date_added.desc()).first()
+        if most_recent_eat:
+            most_recent_eat.time_delta = timedelta(seconds=total_seconds)
+            db.session.commit()
+        return
 
     subquery = db.session.query(
-    eat.date_added.cast(db.Date).label('date'),
-    func.min(eat.date_added).label('first_record'),
-    func.max(eat.date_added).label('last_record') ).group_by('date').subquery()
+        eat.date_added.cast(db.Date).label('date'),
+        func.min(eat.date_added).label('first_record'),
+        func.max(eat.date_added).label('last_record')
+    ).group_by('date').subquery()
 
-    query = db.session.query(subquery.c.date, 
-                             (subquery.c.first_record - 
-                            func.lag(subquery.c.last_record).over(order_by=subquery.c.date)).label('time_delta')
-                           )
-    
+    query = db.session.query(subquery.c.date,
+                             (subquery.c.first_record -
+                              func.lag(subquery.c.last_record).over(order_by=subquery.c.date)).label('time_delta')
+                             )
 
-    # Get time delta in seconds to calculated total fasted time
+    # Get time delta in seconds to calculate total fasted time
     for row in query:
         if row.time_delta is not None:
-        # Convert the time delta to hours and minutes
-            total_seconds = row.time_delta.total_seconds()
-            hours, remainder = divmod(total_seconds, 3600)
-            minutes, _ = divmod(remainder, 60)
+            # Convert the time delta to hours and minutes
+            total_seconds += row.time_delta.total_seconds()  # Accumulate total seconds
 
-            # print(f"Date: {row.date}, Time Delta: {int(hours)} hours and {int(minutes)} minutes")
+    # Convert accumulated total_seconds to hours and minutes outside the loop
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+    print(f"Total Fasted Time: {int(hours)} hours and {int(minutes)} minutes")
 
-
-    # Write time delta to the DB, optimize or change later 
+    # Write time delta to the DB, optimize or change later
     today = datetime.now().date()
-    
-    ## Count number of rows if one row for meal means it is OMAD
     most_recent_eat = eat.query.order_by(eat.date_added.desc()).first()
     if most_recent_eat:
         most_recent_eat.time_delta = timedelta(seconds=total_seconds)
         db.session.commit()
-
 
 
 
