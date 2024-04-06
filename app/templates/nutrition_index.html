@@ -27,25 +27,24 @@
     <table class="table table-success table-striped table-hover table-dark" border="0.2">
         <thead>
             <tr>
-                <th>ID</th>
+                <!--  <th>ID</th>    --> 
                 <th>Meal</th>
-                <th>Drink</th>
-                <th>Drink Count</th>
-                <th>Date Added</th>
                 <th>Comments</th>
                 <td>Fasted</td>
+                <th>Date Added</th>
+                <th>Weight</th>
+                
+                
                 <th colspan="2">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for query in nutrition_query_all %}
                 <tr>
-                    <td>{{query.id}}</td>
+                    <!--  <td>{{query.id}}</td> --> 
                     <td>{{query.meal}}</td>
-                    <td>{{query.drink}}</td>
-                    <td>{{query.drink_count}}</td>
-                    <td>{{query.date_added.strftime('%Y-%m-%d %H:%M')}}</td>
                     <td>{{query.comment}}</td>
+                    
                     {% if query.time_delta %}
                         {% if query.time_delta.days == 0 %}
                             <td>{{ query.time_delta.seconds//3600 }}Hr : {{ (query.time_delta.seconds//60)%60 }}Min </td>
@@ -55,6 +54,10 @@
                     {% else %}
                         <td>No Data</td>
                     {% endif %}
+
+                    <td>{{query.date_added.strftime('%Y-%m-%d %H:%M')}}</td>
+                    <td>{{query.weight}}</td>
+
                     <td>
                         <a href="" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaledit{{query.id}}">Update</a>
                         <form action="{{ url_for('delete_nutrition', id=query.id) }}" method="POST">
@@ -72,32 +75,38 @@
                                 <h4 class="modal-title">Update Meal</h4>
                             </div>
                             <div class="modal-body" style="background-color: #273746;">
+
                                 <form action="{{url_for('update_nutrition')}}" method="POST">
+
                                     <div class="form-group">
                                         <label>Meal:</label>
                                         <input type="hidden"  name="id" value="{{query.id}}">
                                         <input type="text" class="form-control" name="meal" value="{{query.meal}}" >
                                     </div>
-                                    <div class="form-group">
-                                        <label>Drink:</label>
-                                        <input type="text" class="form-control" name="drink" value="{{query.drink}}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Drink Count:</label>
-                                        <input type="number" class="form-control" name="drink_count" value="{{query.drink_count}}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Modify Date Added:</label>
-                                        <input type="datetime-local" class="form-control" name="date_added" value="{{query.date_added}}">
-                                    </div>
+
                                     <div class="form-group">
                                         <label>Comment:</label>
                                         <input type="text" class="form-control" name="comment" value="{{query.comment}}">
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Modify Date Added:</label>
+                                        <input type="datetime-local" class="form-control" name="date_added" value="{{query.date_added}}">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>Weight:</label>
+                                        <input type="number" step="0.01" class="form-control" name="weight" value="{{query.weight}}">
+                                    </div>
+                                    
+                                   
                                     <div class="form-group">
                                         <button class="btn btn-primary mt-4" type="submit">Update</button>
                                     </div>
+
                                 </form>
+
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -105,6 +114,10 @@
                         </div>
                     </div>
                 </div>
+
+
+
+
             {% endfor %}
         </tbody>
     </table>

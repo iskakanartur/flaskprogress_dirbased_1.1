@@ -298,10 +298,9 @@ def daily_fit_stats_viz():
 
 class NutritionForm(FlaskForm):
     meal = StringField('Meal', validators=[DataRequired()])
-    drink = StringField('Drink', validators=[DataRequired()])
-    drink_count = StringField('Drink Count', validators=[DataRequired()])
-    date_added = DateTimeLocalField('Date Added', format='%Y-%m-%dT%H:%M:%S', default=datetime.now, render_kw={"placeholder": "Optional"})
     comment = StringField('Comment')
+    date_added = DateTimeLocalField('Date Added', format='%Y-%m-%dT%H:%M:%S', default=datetime.now, render_kw={"placeholder": "Optional"})
+    weight = StringField('Drink Count', validators=[DataRequired()])
     submit = SubmitField('Add Nutrition')
 
 @app.route('/nutrition_index')
@@ -309,63 +308,60 @@ def nutrition_index():
     nutrition_query_all = eat.query.order_by(eat.date_added.asc()).all()
     return render_template('nutrition_index.html', nutrition_query_all=nutrition_query_all )
 
-@app.route('/add_nutrition/', methods = ['POST'])
+@app.route('/add_nutrition/', methods=['POST'])
 def insert_nutrition():
     exists = db.session.query(
-    db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()).scalar()
+        db.session.query(eat).filter(cast(eat.date_added, Date) >= datetime.now().date()).exists()
+    ).scalar()
 
-    # If There are reocrds for today No need to calculate time delta
-    if exists:
-        if request.method =='POST':
-            session = eat(
-                meal =    request.form.get('meal'),
-                drink =   request.form.get('drink'),
-                drink_count =   request.form.get('drink_count'),
-                # or is used to insert now() if the field is empty
-                date_added=request.form.get('date_added') or func.now(), 
-                comment =    request.form.get('comment')
-                    )
-            db.session.add(session)
-            db.session.commit()
-            return redirect(url_for('nutrition_index'))
-        
-    # If no records: This is first meal for today so calc time delta with 
-    # Yesterday's Last Meal 
-    else:
-        
-        if request.method =='POST':
-            session = eat(
-                meal =    request.form.get('meal'),
-                drink =   request.form.get('drink'),
-                drink_count =   request.form.get('drink_count'),
-                date_added = request.form.get('date_added')  or func.now(),
-                comment =    request.form.get('comment')
-                    )
-            db.session.add(session)
-            db.session.commit()
-            query_fasted_time () # This actually calculates time delta
-            return redirect(url_for('nutrition_index'))
+    if request.method == 'POST':
+        meal = request.form.get('meal')
+        comment = request.form.get('comment')
+        date_added = request.form.get('date_added') or func.now()
+
+        # Check if weight is provided; if not, set it to None
+        weight = request.form.get('weight')
+        weight = float(weight) if weight else None
+
+        session = eat(
+            meal=meal,
+            comment=comment,
+            date_added=date_added,
+            weight=weight
+        )
+        db.session.add(session)
+        db.session.commit()
+
+        if not exists:
+            query_fasted_time()  # Calculate time delta if no records for today
+
+    return redirect(url_for('nutrition_index'))
+
 
     
 
 ##### UPDATE NUTRITION !!!!!!!!!! ATTENTION ERROR HANDLING !!!!!!
             
-@app.route('/update_nutrition/', methods = ['POST'])
+@app.route('/update_nutrition/', methods=['POST'])
 def update_nutrition():
     if request.method == "POST":
-        # my_data = eat.query.get(request.form('id')) ## This is index methid square vs just brackets
-        my_data = eat.query.get( request.form['id'] ) ## Compare this to the index
-
+        my_data = eat.query.get(request.form['id'])
 
         my_data.meal = request.form['meal']
-        my_data.drink = request.form['drink']
-        my_data.drink_count = request.form['drink_count']
-        my_data.date_added = request.form['date_added']
         my_data.comment = request.form['comment']
-        
+
+        # Check if date_added field is provided in the form
+        date_added = request.form['date_added']
+        if date_added:
+            my_data.date_added = date_added
+
+        my_data.weight = request.form['weight']
+
         db.session.commit()
-        flash("Գնումը Գրանցված է")
+        flash("Nutrition Data Updated")
         return redirect(url_for('nutrition_index'))
+
+
     
 
 #### Delete Nutrition 
