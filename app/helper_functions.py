@@ -33,9 +33,9 @@ from dateutil.relativedelta import relativedelta, MO ## for helper function to q
 ######################### Query Past Monday to Sunday Results  #########################
 def mo_su_query():
     # <= in the first clause (func.date_tunc) makes it monday to monday
-    mo_su = db.session.query(Learn).filter (and_
-                (Learn.date_added <= func.date_trunc('week', func.now( ) ), 
-                 Learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(Learn.date_added )
+    mo_su = db.session.query(learn).filter (and_
+                (learn.date_added <= func.date_trunc('week', func.now( ) ), 
+                 learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(learn.date_added )
     return (mo_su)
 
 
@@ -56,8 +56,8 @@ def get_last_weekly_goal():
 
 ######################## Get All SUbject Names
 def get_subjects ():
-    # subject_names = [subj.subject for subj in Learn.query.all()]
-    subject_names = [subj for subj in db.session.query(Learn.subject).distinct()]
+    # subject_names = [subj.subject for subj in learn.query.all()]
+    subject_names = [subj for subj in db.session.query(learn.subject).distinct()]
     subject_names = [i[0] for i in subject_names]
     return (subject_names)
 
@@ -65,17 +65,17 @@ def get_subjects ():
 
 
 
-###################### OPTIMIZE LATER DISTINCT SUBJECTS & TOTAL HOURS LEARNED EACH sunday to monday 
+###################### OPTIMIZE LATER DISTINCT SUBJECTS & TOTAL HOURS learnED EACH sunday to monday 
 def subj_total ():
     from sqlalchemy import and_ ### to combine db queries below
     distinct_subjects = get_subjects()
     res = []
     subj_total_sum_mo_su = []
     for subject in distinct_subjects:
-        qry_res = db.session.query(Learn).filter (and_( 
-        Learn.date_added < func.date_trunc('week', func.now( ) ), 
-        Learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7),
-        Learn.subject== subject)).with_entities(func.sum(Learn.duration)).scalar()
+        qry_res = db.session.query(learn).filter (and_( 
+        learn.date_added < func.date_trunc('week', func.now( ) ), 
+        learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7),
+        learn.subject== subject)).with_entities(func.sum(learn.duration)).scalar()
 
         res.append(qry_res)
         subj_total_sum_mo_su.append((subject, qry_res))
@@ -140,7 +140,7 @@ def fit_exercise_stats_past_mo_su ():
     # <= in the first clause (func.date_tunc) makes it monday to monday
     mo_su = db.session.query(fit).filter (and_
                 (fit.date_added <= func.date_trunc('week', func.now( ) ), 
-                 Learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(fit.date_added )
+                 learn.date_added >= func.date_trunc('week', func.now( ) ) - timedelta(days=7))).order_by(fit.date_added )
     
     # Print the results
     for record in mo_su:
