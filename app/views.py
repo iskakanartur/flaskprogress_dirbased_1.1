@@ -41,7 +41,7 @@ from flask import Flask, render_template
 
 @app.route('/')
 def index():
-    learn_query_all = Learn.query.order_by(Learn.date_added.asc()).all()
+    learn_query_all = learn.query.order_by(learn.date_added.asc()).all()
 
 
     return render_template('index.html', learn_query_all=learn_query_all )
@@ -49,11 +49,11 @@ def index():
 
 
 
-###### ADD LEARNING SESSION or a TASK 
+###### ADD learnING SESSION or a TASK 
 @app.route('/add/', methods = ['POST'])
 def insert_subject():
     if request.method =='POST':
-        session = Learn(
+        session = learn(
             subject =    request.form.get('subject'),
             duration =   request.form.get('duration'),
             comment =    request.form.get('comment'),
@@ -73,7 +73,7 @@ def insert_subject():
 @app.route('/update/', methods = ['POST'])
 def update():
     if request.method == "POST":
-        my_data = Learn.query.get(request.form.get('id'))
+        my_data = learn.query.get(request.form.get('id'))
 
         my_data.subject = request.form['subject']
         my_data.duration = request.form['duration']
@@ -85,7 +85,7 @@ def update():
         return redirect(url_for('index'))
     
 
-##### Set Weekly Learning Goal from Navbar
+##### Set Weekly learning Goal from Navbar
 @app.route('/week_goal/', methods = ['POST'])
 def wkly_goal():
     if request.method =='POST':
