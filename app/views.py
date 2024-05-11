@@ -39,14 +39,20 @@ from flask import Flask, render_template
 
 ############################################### Views for Goal Tracking App ###################################
 
-@app.route('/')
+#@app.route('/')
+#def index():
+    #learn_query_all = learn.query.order_by(learn.date_added.asc()).all()
+
+
+    #return render_template('index.html', learn_query_all=learn_query_all )
+
+PER_PAGE = 10  # Adjust the number of items per page as needed
+
+@app.route('/', methods=['GET'])
 def index():
-    learn_query_all = learn.query.order_by(learn.date_added.asc()).all()
-
-
-    return render_template('index.html', learn_query_all=learn_query_all )
-                           
-
+    page = request.args.get('page', 1, type=int)
+    learn_query_all = learn.query.paginate(page=page, per_page=PER_PAGE)
+    return render_template('index.html', pagination=learn_query_all)
 
 
 ###### ADD learnING SESSION or a TASK 
